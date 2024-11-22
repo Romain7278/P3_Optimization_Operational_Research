@@ -2,21 +2,7 @@
 
 ## Overview
 
-This project aims to transform a primal problem into a dual problem and perform several calculations on both problems.
-
-## Table of Contents
-
-- [Features](#features)
-- [Getting Started](#getting-started)
-- [Known Issues](#known-issues)
-
-## Features
-
-- **OR-Tools Integration**
-- **Step-by-Step Simplex Method**
-- **Multiple Solutions Support**: Finds alternative optimal solutions when they exist (for more precision view the Known Issues section)
-- **Handles Unbounded and Infeasible Cases**: Output when the feasible region is unbounded or no feasible solution exists.
-- **Handles N-Dimensions Problem**
+This project aims to transform a primal problem into a dual problem and perform several calculations on both problems. It can theoratically handle n-dimension problems.
 
 ## Getting Started
 
@@ -24,48 +10,64 @@ This project aims to transform a primal problem into a dual problem and perform 
 
 - **Python 3.X**
 - **Numpy**
-- **Pandas**
-- **Google OR Tools**
+- **Scipy**
 
 You can install them using pip:
 
 ```bash
-pip install numpy pandas ortools
+pip install numpy scipy
 ```
 ### Execution
 
-The program accepts the number of variables, constraints, and the coefficients of the objective function and constraints as command-line arguments:
+The program accepts the following command-line arguments:
 
-- num_vars: Number of variables in the problem.
-- num_constraints: Number of constraints in the problem.
-- c: Coefficients of the objective function.
-- A: Coefficients of the constraints in row-major order.
-- b: Right-hand side (RHS) values for each constraint.
+- **`--num_vars`**  
+  The number of variables in the primal problem.
+
+- **`--num_constraints`**  
+  The number of constraints in the primal problem.
+
+- **`--c`**  
+  Coefficients of the objective function (one coefficient per variable).
+
+- **`--A`**  
+  A flat list of coefficients for the constraints, provided in **row-major order**.
+
+- **`--b`**  
+  Right-hand side (RHS) values for the constraints, one value per constraint.
+
+- **`--constraint_signs`**  
+  The relational signs of the constraints (`<=`, `=`, or `>=`).
+
+- **`--possible_sol`**  
+  A possible solution to the primal problem (list of values for the variables).
+
+- **`--type`**  
+  The type of optimization for the primal problem, either `"max"` for maximization or `"min"` for minimization.
 
 Here is an example with the following problem:
 
-maximize z = 3x1 + x2
+$$
+\text{Maximize } x_1 + 4x_2 + 2x_3
+$$
 
-subject to
-- x2 ≤ 5
-- x1 + x2 ≤ 10
-- −x1 + x2 ≥ −2
-- x1, x2 ≥ 0
+Subject to:
+
+$$
+\begin{aligned}
+    5x_1 + 2x_2 + 2x_3 &\leq 145 \\
+    4x_1 + 8x_2 - 8x_3 &\leq 260 \\
+    x_1 + x_2 + 4x_3 &\leq 190 \\
+    x &\geq 0
+\end{aligned}
+$$
+
+Potential solution of the primal problem: (0, 52.5, 0)
 
 ```bash
-python P2_LEFEBVRE_Romain_Group_B.py --c 3 1 --A 0 1 1 1 1 -1 --b 5 10 2 --num_vars 2 --num_constraints 3
+python P3_LEFEBVRE_Romain_Group_B.py --num_vars 3 --num_constraints 3 --c 1 4 2 --A 5 2 2 4 8 -8 1 1 4 --b 145 260 190 --constraint_signs '<=' '<=' '<=' --possible_sol 10 20 30 --type max
 ```
 You can get some help with the following command:
 ```bash
-python P2_LEFEBVRE_Romain_Group_B.py -h
+python P3_LEFEBVRE_Romain_Group_B.py -h
 ```
-### Output
-
-OR-Tools Solver: Prints the optimal solution and objective value.
-
-Step by Step Simplex Method: Displays each tableau step-by-step, showing the pivot operations, basic and non-basic variables, and checks for alternative solutions.
-
-## Known Issues
-
-When dealing with a problem with multiple optimal solutions, the function using OR Tools to solve the problem will not return all the optimal solutions of the problem as the solver GLOP returns by default only one optimal solution.
-For a 2D problem, it will return a solution which is not on the corners of the feasible region but rather on the corresponding side of the feasible region.
